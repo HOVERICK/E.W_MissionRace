@@ -11,13 +11,15 @@
             theme: {
                 extend: {
                     colors: {
-                        yamoija: '#1E3A8A', // Deep Navy
-                        ecoworld: '#22C55E', // Green
-                        bgLight: '#F3F4F6'
+                        yamoija: '#2C3E50', // Soft Navy/Charcoal
+                        healingGreen: '#A3B18A', // Sage Green
+                        warmBeige: '#F2EFE9', // Off-white/Beige
+                        softGray: '#DAD7CD',
+                        accentSage: '#588157'
                     },
                     borderRadius: {
-                        'xl': '1rem',
-                        '2xl': '1.5rem',
+                        '3xl': '1.5rem',
+                        '4xl': '2rem',
                     }
                 }
             }
@@ -28,25 +30,25 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;900&display=swap');
         body { 
             font-family: 'Pretendard', sans-serif; 
             -webkit-tap-highlight-color: transparent; 
-            background-color: #E5E7EB; /* Slightly darker background for the 'container' effect */
+            background-color: #ECE9E6;
         }
         .mobile-container {
             max-width: 480px;
             margin: 0 auto;
-            background-color: #F3F4F6;
+            background-color: #F8F7F4;
             min-height: 100vh;
             position: relative;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            box-shadow: 0 0 30px rgba(0,0,0,0.05);
         }
-        .sticky-bottom { position: absolute; bottom: 0; left: 0; right: 0; }
-        .modal-overlay { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
-        .pulse-animation { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .9; transform: scale(1.02); } }
-        .rank-bar { transition: width 1s ease-out; }
+        .modal-overlay { background: rgba(44, 62, 80, 0.4); backdrop-filter: blur(6px); }
+        .pulse-soft { animation: pulseSoft 2.5s ease-in-out infinite; }
+        @keyframes pulseSoft { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.03); opacity: 0.9; } }
+        .rank-bar { transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1); }
+        ::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
@@ -55,19 +57,18 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // 미션 데이터 - 로컬 이미지 폴더(images/) 경로로 수정
         const MISSION_DATA = [
-            { id: 1, type: "[관찰/추리]", title: "응답하라 1960! 시크릿 암호 해독", location: "석탄박물관 & 사택촌 골목", desc: "옛 광부들의 마을에서 퀴즈 정답 찾아 모바일 입력", icon: "🕵️‍♂️", image: "images/mission1/thumb.png" },
-            { id: 2, type: "[힐링/휴식]", title: "가은 모노레일 정상의 비밀", location: "모노레일 정상 하차장 (제1촬영장)", desc: "에코월드 전경을 감상하며 숨겨진 QR코드 스캔", icon: "🚠", image: "images/mission2/thumb.jpg" },
-            { id: 3, type: "[협동/포토]", title: "조선시대 원근법 마술", location: "가은오픈세트장", desc: "사극 궁궐을 배경으로 코믹한 착시 단체 사진 촬영", icon: "📸", image: "images/mission3/thumb.jpg" },
-            { id: 4, type: "[액티비티]", title: "무중력 에이전트 점프샷", location: "에코타운 자이언트 포레스트 잔디밭", desc: "조원 전체가 공중에 떠 있는 타이밍 점프샷 촬영", icon: "🏃‍♂️", image: "images/mission4/thumb.jpg" },
-            { id: 5, type: "[탐색/명분]", title: "에코월드 간판 헌터", location: "거미열차 및 이동 동선 전역", desc: "이정표의 글자들을 사진으로 찍어 조합하여 인증", icon: "🔍", image: "images/mission5/thumb.jpg" }
+            { id: 1, type: "[힐링/휴식]", title: "가은 모노레일 정상의 비밀", location: "모노레일 탑승장 ~ 제1촬영장", desc: "도심을 벗어나 숲을 감상하며 QR코드 스캔 (프리패스!)", icon: "🚠", image: "images/mission2/thumb.jpg" },
+            { id: 2, type: "[가은오픈세트장]", title: "우리의 든든한 등 (화보)", location: "제1, 2촬영장 성곽/궁궐", desc: "웅장한 세트장을 향한 든든한 뒷모습 단체 촬영", icon: "🏰", image: "images/mission3/thumb.jpg" },
+            { id: 3, type: "[리워드/토크]", title: "숨은 다방 커피 헌터", location: "탄광 사택촌 옛날 골목길", desc: "QR 스캔 후 퀴즈 풀고 시원한 커피 쿠폰 받기", icon: "☕", image: "images/mission1/thumb.png" },
+            { id: 4, type: "[모노레일/풍경]", title: "오늘의 카페인 건배사", location: "에코월드 전경 앞", desc: "탁 트인 풍경 속에서 음료 잔 '짠~' 하는 POV 샷", icon: "🥤", image: "images/mission5/thumb.jpg" },
+            { id: 5, type: "[단합/산책]", title: "자이언트 포레스트 발자취", location: "자이언트 포레스트 잔디밭", desc: "조원들의 신발을 모아 찍는 감성 슈즈 서클 항공샷", icon: "👟", image: "images/mission4/thumb.jpg" }
         ];
 
         const RANKING_DATA = [
-            { team: "1조", score: 1500, color: "bg-orange-500", max: 2000 },
-            { team: "2조", score: 1200, color: "bg-blue-500", max: 2000 },
-            { team: "3조", score: 900, color: "bg-indigo-500", max: 2000 }
+            { team: "1조", score: 1500, color: "bg-healingGreen", max: 2000 },
+            { team: "2조", score: 1200, color: "bg-softGray", max: 2000 },
+            { team: "3조", score: 900, color: "bg-stone-300", max: 2000 }
         ];
 
         function App() {
@@ -76,7 +77,7 @@
             const [isRankLoaded, setIsRankLoaded] = useState(false);
 
             useEffect(() => {
-                setTimeout(() => setIsRankLoaded(true), 500);
+                setTimeout(() => setIsRankLoaded(true), 600);
             }, []);
 
             const allMissionsCompleted = completedMissions.size === MISSION_DATA.length;
@@ -91,99 +92,91 @@
                 setCompletedMissions(next);
             };
 
-            // 이미지 로드 실패 시 대체 이미지 처리
             const handleImgError = (e) => {
-                e.target.src = "https://via.placeholder.com/400x200?text=Mission+Image";
+                e.target.src = "https://via.placeholder.com/200x150/DAD7CD/588157?text=EcoWorld";
             };
 
             return (
-                <div className="mobile-container pb-36">
-                    {/* Header */}
-                    <header className="bg-yamoija text-white px-6 py-8 sticky top-0 z-40 shadow-lg rounded-b-[2.5rem]">
-                        <div className="flex justify-between items-center mb-2">
-                            <h1 className="text-2xl font-black tracking-tighter italic">YAMOIZA</h1>
-                            <span className="bg-white/20 px-4 py-1.5 rounded-full text-sm font-bold backdrop-blur-md border border-white/10">1조 접속중</span>
+                <div className="mobile-container pb-32">
+                    {/* Sticky Header & Ranking */}
+                    <div className="sticky top-0 z-40 bg-[#F8F7F4]/90 backdrop-blur-md">
+                        <header className="bg-yamoija text-white px-6 py-6 rounded-b-[2.5rem] shadow-md">
+                            <div className="flex justify-between items-center mb-1">
+                                <h1 className="text-xl font-black italic tracking-tight text-softGray">YAMOIZA</h1>
+                                <span className="bg-white/10 border border-white/20 px-3 py-1 rounded-full text-[10px] font-bold">1조 접속중</span>
+                            </div>
+                            <p className="text-[11px] text-softGray/80 font-semibold flex items-center gap-1.5">
+                                <span className="w-1.5 h-1.5 bg-healingGreen rounded-full shadow-[0_0_8px_rgba(163,177,138,0.8)]"></span>
+                                [M6] 문경 에코월드 힐링레이스
+                            </p>
+                        </header>
+
+                        {/* Ranking Card - Pastel Tone */}
+                        <div className="px-6 py-4">
+                            <section className="bg-white p-4 rounded-3xl shadow-sm border border-slate-50">
+                                <div className="flex justify-between items-center mb-3 px-1">
+                                    <h2 className="text-sm font-bold text-slate-700 flex items-center gap-1.5">
+                                        🍃 실시간 소통 현황
+                                    </h2>
+                                    <span className="text-[9px] font-bold text-healingGreen bg-healingGreen/10 px-2 py-0.5 rounded-full">ACTIVE</span>
+                                </div>
+                                <div className="grid grid-cols-3 gap-4">
+                                    {RANKING_DATA.map((rank, idx) => (
+                                        <div key={idx} className="space-y-1.5 text-center">
+                                            <div className="text-[10px] font-bold text-slate-500 truncate">{idx + 1}위 {rank.team}</div>
+                                            <div className="h-1.5 bg-slate-50 rounded-full overflow-hidden border border-slate-100/50">
+                                                <div 
+                                                    className={`h-full ${rank.color} rounded-full rank-bar shadow-sm`}
+                                                    style={{ width: isRankLoaded ? `${(rank.score / rank.max) * 100}%` : '0%' }}
+                                                />
+                                            </div>
+                                            <div className="text-[9px] text-slate-400 font-bold italic">{rank.score} P</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
                         </div>
-                        <p className="text-sm text-blue-200 font-semibold flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
-                            [M6] 문경 에코월드 미션레이스
-                        </p>
-                    </header>
+                    </div>
 
-                    <main className="px-6 mt-8 space-y-8">
-                        {/* Real-time Ranking Card */}
-                        <section className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
-                            <div className="flex justify-between items-center mb-6">
-                                <h2 className="text-xl font-black text-slate-800 flex items-center gap-2">
-                                    🏆 실시간 순위
-                                </h2>
-                                <span className="text-[11px] font-black text-yamoija bg-yamoija/5 px-3 py-1 rounded-full uppercase">LIVE</span>
-                            </div>
-                            <div className="space-y-6">
-                                {RANKING_DATA.map((rank, idx) => (
-                                    <div key={idx} className="space-y-2.5">
-                                        <div className="flex justify-between items-end">
-                                            <span className="text-sm font-black text-slate-700">{idx + 1}위. {rank.team}</span>
-                                            <span className="text-yamoija font-black text-base italic">{rank.score.toLocaleString()} P</span>
-                                        </div>
-                                        <div className="h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-50 shadow-inner">
-                                            <div 
-                                                className={`h-full ${rank.color} rounded-full rank-bar shadow-lg`}
-                                                style={{ width: isRankLoaded ? `${(rank.score / rank.max) * 100}%` : '0%' }}
-                                            />
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-
-                        {/* Mission List */}
-                        <section className="space-y-5">
-                            <h2 className="text-xl font-black text-slate-800 flex items-center justify-between">
-                                <span>🎯 미션 현황</span>
-                                <span className="text-xs font-bold text-slate-400 bg-slate-100 px-3 py-1.5 rounded-full">
-                                    {completedMissions.size} / {MISSION_DATA.length}
+                    <main className="px-6 space-y-6">
+                        {/* Mission List - 2 Column Grid */}
+                        <section className="space-y-4">
+                            <h2 className="text-base font-bold text-slate-700 flex items-center justify-between px-1">
+                                <span>🌿 오늘의 미션</span>
+                                <span className="text-[10px] font-bold text-healingGreen bg-white px-3 py-1 rounded-full shadow-sm border border-slate-50">
+                                    {completedMissions.size} / {MISSION_DATA.length} 완료
                                 </span>
                             </h2>
-                            <div className="space-y-6">
+                            <div className="grid grid-cols-2 gap-4">
                                 {MISSION_DATA.map((mission) => (
-                                    <div key={mission.id} className="bg-white rounded-[2rem] overflow-hidden shadow-sm border border-slate-100 transition-all duration-300 active:scale-[0.98]">
-                                        <div className="relative h-44 overflow-hidden">
+                                    <div key={mission.id} className={`bg-white rounded-[2rem] overflow-hidden shadow-sm border border-slate-50 flex flex-col transition-all duration-500 active:scale-95 ${completedMissions.has(mission.id) ? 'opacity-60 grayscale-[40%]' : 'hover:shadow-md'}`}>
+                                        <div className="relative h-28 overflow-hidden">
                                             <img 
                                                 src={mission.image} 
                                                 alt={mission.title} 
                                                 onError={handleImgError}
                                                 className="w-full h-full object-cover" 
                                             />
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                                            <div className="absolute top-4 left-4 bg-yamoija text-white px-3 py-1 rounded-lg text-[11px] font-black shadow-lg">
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                                            <div className="absolute top-2.5 left-2.5 bg-white/90 backdrop-blur-sm text-accentSage px-2 py-0.5 rounded-lg text-[8px] font-bold shadow-sm">
                                                 {mission.type}
                                             </div>
-                                            <div className="absolute bottom-4 left-4 text-white">
-                                                <div className="text-xs font-bold flex items-center gap-1.5 opacity-90 drop-shadow-md">
-                                                    📍 {mission.location}
-                                                </div>
-                                            </div>
                                         </div>
-                                        <div className="p-5 flex flex-col">
-                                            <h3 className="font-black text-lg mb-2 flex items-center gap-2 leading-tight text-slate-800">
+                                        <div className="p-4 flex flex-col flex-1">
+                                            <h3 className="font-bold text-[13px] mb-1.5 line-clamp-2 leading-snug text-slate-800">
                                                 {mission.icon} {mission.title}
                                             </h3>
-                                            <p className="text-xs font-medium text-slate-500 mb-5 leading-relaxed">{mission.desc}</p>
+                                            <p className="text-[9px] font-semibold text-slate-400 mb-4 line-clamp-1 italic">📍 {mission.location}</p>
                                             
                                             <button 
                                                 onClick={() => toggleMission(mission.id)}
-                                                className={`w-full py-4 rounded-2xl text-sm font-black transition-all duration-300 flex items-center justify-center gap-2 shadow-lg ${
+                                                className={`w-full py-2.5 rounded-2xl text-[11px] font-bold transition-all duration-500 flex items-center justify-center gap-1 shadow-sm ${
                                                     completedMissions.has(mission.id) 
-                                                    ? 'bg-slate-100 text-slate-400 border border-slate-200 shadow-none' 
-                                                    : 'bg-yamoija text-white shadow-yamoija/20 active:bg-blue-900'
+                                                    ? 'bg-slate-50 text-slate-300 border border-slate-100 shadow-none' 
+                                                    : 'bg-healingGreen text-white active:bg-accentSage'
                                                 }`}
                                             >
-                                                {completedMissions.has(mission.id) ? (
-                                                    <>✅ 미션 완료</>
-                                                ) : (
-                                                    <>미션 수행하기</>
-                                                )}
+                                                {completedMissions.has(mission.id) ? '완료 🌿' : '기록하기'}
                                             </button>
                                         </div>
                                     </div>
@@ -192,46 +185,47 @@
                         </section>
                     </main>
 
-                    {/* Sticky Footer Button */}
-                    <div className="fixed bottom-0 left-0 right-0 max-w-[480px] mx-auto p-6 bg-gradient-to-t from-bgLight via-bgLight/95 to-transparent pt-12 z-40">
+                    {/* Sticky Footer Button - Soft Design */}
+                    <div className="fixed bottom-0 left-0 right-0 max-w-[480px] mx-auto p-6 bg-gradient-to-t from-[#F8F7F4] via-[#F8F7F4]/90 to-transparent pt-12 z-40 text-center">
                         <button 
                             disabled={!allMissionsCompleted}
                             onClick={() => setIsModalOpen(true)}
-                            className={`w-full py-5 rounded-3xl text-lg font-black shadow-2xl transition-all duration-500 transform ${
+                            className={`w-full py-4.5 rounded-[2rem] text-sm font-bold shadow-xl transition-all duration-700 transform ${
                                 allMissionsCompleted 
-                                ? 'bg-ecoworld text-white pulse-animation active:scale-95 shadow-ecoworld/40' 
-                                : 'bg-slate-300 text-slate-500 cursor-not-allowed opacity-80'
+                                ? 'bg-accentSage text-white pulse-soft active:scale-95 shadow-accentSage/20' 
+                                : 'bg-slate-200 text-slate-400 cursor-not-allowed opacity-80'
                             }`}
+                            style={{ padding: '18px 0' }}
                         >
                             {allMissionsCompleted ? (
                                 <span className="flex items-center justify-center gap-2">🚩 최종 집결지 확인하기</span>
                             ) : (
-                                <span className="text-sm font-bold">모든 미션 완료 시 공개됩니다</span>
+                                <span className="text-[11px] font-bold text-slate-400/80">함께 모든 미션을 완료해 주세요</span>
                             )}
                         </button>
                     </div>
 
-                    {/* Result Modal */}
+                    {/* Result Modal - Healing Style */}
                     {isModalOpen && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center p-8 modal-overlay">
-                            <div className="bg-white rounded-[3rem] p-10 w-full max-w-sm text-center shadow-2xl relative overflow-hidden animate-in fade-in zoom-in duration-300">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-ecoworld/10 rounded-full blur-3xl -mr-10 -mt-10" />
+                            <div className="bg-white rounded-[3rem] p-10 w-full max-w-sm text-center shadow-2xl relative overflow-hidden animate-in fade-in zoom-in duration-500">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-healingGreen/10 rounded-full blur-3xl -mr-12 -mt-12" />
                                 
-                                <div className="text-6xl mb-6 drop-shadow-lg">🏆</div>
-                                <h2 className="text-3xl font-black text-slate-900 mb-6 tracking-tight">MISSION<br/>COMPLETED!</h2>
-                                <div className="space-y-4 mb-8">
-                                    <p className="text-slate-500 text-sm font-bold">축하합니다! 모든 미션을 수행했습니다.</p>
-                                    <div className="bg-slate-50 p-6 rounded-[2rem] border-2 border-dashed border-ecoworld/30">
-                                        <p className="text-xs text-slate-400 mb-2 font-black uppercase tracking-widest">Final Destination</p>
-                                        <p className="text-slate-800 font-black text-lg leading-snug">
+                                <div className="text-5xl mb-6">🍃</div>
+                                <h2 className="text-2xl font-bold text-slate-800 mb-4 tracking-tighter leading-tight">함께라서 즐거운<br/>여행이었습니다</h2>
+                                <div className="space-y-4 mb-8 text-center">
+                                    <p className="text-slate-500 text-[11px] font-semibold">모든 발자취를 기록했습니다.</p>
+                                    <div className="bg-slate-50 p-6 rounded-[2.5rem] border border-healingGreen/20">
+                                        <p className="text-[10px] text-healingGreen font-bold uppercase tracking-widest mb-2">Final Station</p>
+                                        <p className="text-slate-700 font-bold text-[15px] leading-relaxed">
                                             [에코월드 정문 옆 매표소]에 있는<br/>
-                                            <span className="text-ecoworld underline decoration-ecoworld/30 decoration-4 underline-offset-4">운영인력</span>을 찾아주세요!
+                                            <span className="text-accentSage px-1 border-b-2 border-accentSage/20">운영인력</span>을 찾아주세요!
                                         </p>
                                     </div>
                                 </div>
                                 <button 
                                     onClick={() => setIsModalOpen(false)}
-                                    className="w-full py-5 bg-yamoija text-white rounded-2xl font-black shadow-xl shadow-yamoija/30 transition-transform active:scale-95"
+                                    className="w-full py-4.5 bg-yamoija text-white rounded-2xl font-bold shadow-lg shadow-yamoija/20 transition-all active:scale-95 text-sm"
                                 >
                                     지도 닫기
                                 </button>
